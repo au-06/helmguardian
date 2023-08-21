@@ -25,19 +25,23 @@ runs:
   steps:
     - name: Checkout code
       run: actions/checkout@v2
+      shell: bash
 
     - name: Check current chart version
       run: |
         CURRENT_CHART_VERSION=$(grep -E '^version:' ${{ inputs.chart-yaml }} | awk '{print $2}')
         echo "Current chart version: $CURRENT_CHART_VERSION"
         echo "CURRENT_CHART_VERSION=$CURRENT_CHART_VERSION" >> $GITHUB_ENV
+      shell: bash
 
     - name: Add ChartMuseum repository
       run: |
         helm repo add fetch-charts ${{ inputs.chartmuseum-url }}
+      shell: bash
 
     - name: Update helm repository
       run: helm repo update
+      shell: bash
 
     - name: Search existing chart on ChartMuseum
       id: search_chart
@@ -47,3 +51,13 @@ runs:
           echo "Chart version already exists on ChartMuseum. Exiting..."
           exit 1
         fi
+      shell: bash
+
+    - name: Set dynamic fields as global env
+      run: |
+        echo "CHART_DIRECTORY=${{ inputs.chart-directory }}" >> $GITHUB_ENV
+        echo "CHART_YAML=${{ inputs.chart-yaml }}" >> $GITHUB_ENV
+        echo "CHARTMUSEUM_URL=${{ inputs.chartmuseum-url }}" >> $GITHUB_ENV
+        echo "CHART_REPO=${{ inputs.chart-repo }}" >> $GITHUB_ENV
+        echo "CHART_NAME=${{ inputs.chart-name }}" >> $GITHUB_ENV
+      shell: bash
