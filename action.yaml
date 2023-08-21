@@ -17,5 +17,5 @@ inputs:
     description: 'Name of the Helm chart'
     required: true
 runs:
-  using: 'bash'
-  main: 'validate_chart.sh'
+  using: 'node12'
+  main: 'main.js'
