@@ -16,6 +16,34 @@ inputs:
   chart-name:
     description: 'Name of the Helm chart'
     required: true
+outputs:
+  chart-validation-result:
+    description: 'Validation result of the Helm chart'
+
 runs:
-  using: 'node12'
-  main: 'main.js'
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      run: actions/checkout@v2
+
+    - name: Check current chart version
+      run: |
+        CURRENT_CHART_VERSION=$(grep -E '^version:' ${{ inputs.chart-yaml }} | awk '{print $2}')
+        echo "Current chart version: $CURRENT_CHART_VERSION"
+        echo "CURRENT_CHART_VERSION=$CURRENT_CHART_VERSION" >> $GITHUB_ENV
+
+    - name: Add ChartMuseum repository
+      run: |
+        helm repo add fetch-charts ${{ inputs.chartmuseum-url }}
+
+    - name: Update helm repository
+      run: helm repo update
+
+    - name: Search existing chart on ChartMuseum
+      id: search_chart
+      run: |
+        CHART_SEARCH_RESULT=$(helm search repo ${{ inputs.chart-repo }}/${{ inputs.chart-name }} --versions -o json | jq -r ".[] | select(.version == \"$CURRENT_CHART_VERSION\")")
+        if [[ ! -z $CHART_SEARCH_RESULT ]]; then
+          echo "Chart version already exists on ChartMuseum. Exiting..."
+          exit 1
+        fi
