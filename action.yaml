@@ -1,0 +1,21 @@
+name: 'Chart Validation for ChartMuseum'
+description: 'Validates and pushes Helm charts to ChartMuseum.'
+inputs:
+  chart-directory:
+    description: 'Path to the chart directory'
+    required: true
+  chart-yaml:
+    description: 'Path to the Chart.yaml file'
+    required: true
+  chartmuseum-url:
+    description: 'URL of ChartMuseum repository'
+    required: true
+  chart-repo:
+    description: 'Name of the chart repository'
+    required: true
+  chart-name:
+    description: 'Name of the Helm chart'
+    required: true
+runs:
+  using: 'bash'
+  main: 'validate_chart.sh'
