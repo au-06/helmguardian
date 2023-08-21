@@ -23,10 +23,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout code
-      run: actions/checkout@v2
-      shell: bash
-
     - name: Check current chart version
       run: |
         CURRENT_CHART_VERSION=$(grep -E '^version:' ${{ inputs.chart-yaml }} | awk '{print $2}')
